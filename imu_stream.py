@@ -65,6 +65,12 @@ def get_x_rotation(x, y, z):
     radians = math.atan2(y, dist(x, z))
     return math.degrees(radians)
 
+
+def data_wrapper(name, value):
+    prepared_string = {"[", name, ":",  value, "]"}
+    return prepared_string
+
+
 bus = smbus.SMBus(1)  # bus = smbus.SMBus(0) fuer Revision 1
 address = 0x68  # via i2cdetect
 
@@ -84,42 +90,46 @@ def client(conn, connection_number):
     gyro = []
     i = 0
 
+    def send(data_name, data_value):
+        wrapped_data = data_wrapper(data_name, data_value)
+        conn.send(str.encode(wrapped_data))
+
     while True:
 
-      i += 1
-      if i > ACCEL_BUFFER_SIZE - 1: i = 0
-      time.sleep(0.001)
-      inst_time = float(time.time())
+        i += 1
+        if i > ACCEL_BUFFER_SIZE - 1:
+            i = 0
+        time.sleep(0.001)
+        inst_time = float(time.time())
 
-      gyroskop_xout = read_word_2c(0x43)
-      scaled_gyro_xout = gyroskop_xout / 131
+        gyroskop_xout = read_word_2c(0x43)
+        scaled_gyro_xout = gyroskop_xout / 131
 
-      beschleunigung_xout = read_word_2c(0x3b)
-      beschleunigung_yout = read_word_2c(0x3d) + 6000
-      beschleunigung_zout = read_word_2c(0x3f) + 4800
-      x = read_mag_word_2c(0x0C)
+        beschleunigung_xout = read_word_2c(0x3b)
+        beschleunigung_yout = read_word_2c(0x3d) + 6000
+        beschleunigung_zout = read_word_2c(0x3f) + 4800
+        x = read_mag_word_2c(0x0C)
 
-      beschleunigung_xout_skaliert = beschleunigung_xout / 16384.0
-      beschleunigung_yout_skaliert = beschleunigung_yout / 16384.0
-      beschleunigung_zout_skaliert = beschleunigung_zout / 16384.0
+        beschleunigung_xout_skaliert = beschleunigung_xout / 16384.0
+        beschleunigung_yout_skaliert = beschleunigung_yout / 16384.0
+        beschleunigung_zout_skaliert = beschleunigung_zout / 16384.0
 
-      ax = beschleunigung_xout_skaliert
-      ay = beschleunigung_yout_skaliert
-      az = beschleunigung_zout_skaliert
+        ax = beschleunigung_xout_skaliert
+        ay = beschleunigung_yout_skaliert
+        az = beschleunigung_zout_skaliert
 
-      xRot = get_x_rotation(beschleunigung_xout_skaliert, beschleunigung_yout_skaliert, beschleunigung_zout_skaliert)
-      yRot = get_y_rotation(beschleunigung_xout_skaliert, beschleunigung_yout_skaliert, beschleunigung_zout_skaliert)
+        xRot = get_x_rotation(beschleunigung_xout_skaliert, beschleunigung_yout_skaliert, beschleunigung_zout_skaliert)
+        yRot = get_y_rotation(beschleunigung_xout_skaliert, beschleunigung_yout_skaliert, beschleunigung_zout_skaliert)
 
-      current_accel = math.sqrt(ax ** 2 + ay ** 2 + az ** 2)
-      y[i] = current_accel
-      gyro.append(scaled_gyro_xout)
+        current_accel = math.sqrt(ax ** 2 + ay ** 2 + az ** 2)
+        y[i] = current_accel
+        gyro.append(scaled_gyro_xout)
 
-      # math:
-      avg_accel = sum(y) / len(y)
-      std_dev = statistics.pstdev(y)
+        # math:
+        avg_accel = sum(y) / len(y)
+        std_dev = statistics.pstdev(y)
 
-      data = avg_accel
-      conn.send(str.encode(data))
+        send("avg accel:", avg_accel)
 
 sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 port = 5555
