@@ -1,5 +1,5 @@
 cd /
-cd Desktop/Tank_game
-sudo git pull
+cd /home/pi/Desktop/Tank_game
+sudo git reset --hard
 sudo python3 imu_stream.py
 cd /
