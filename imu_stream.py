@@ -99,7 +99,7 @@ def client(conn, connection_number):
             raise Exception
         wrapped_data = data_wrapper(data_name, data_value)
         if not type(wrapped_data) == str:
-            print("something went wrong with the data wrapper")
+            print("something went wrong with the data fwrapper")
             raise Exception
 
         conn.send(str.encode(wrapped_data))
