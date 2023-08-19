@@ -92,10 +92,16 @@ def client(conn, connection_number):
 
     def send(data_name, data_value):
         if data_name.find(":") == -1:
+            print("data name can't have a colin in it")
             raise Exception
         if not type(data_name) == str:
+            print("data_name must be string")
             raise Exception
         wrapped_data = data_wrapper(data_name, data_value)
+        if not type(wrapped_data) == str:
+            print("something went wrong with the data wrapper")
+            raise Exception
+
         conn.send(str.encode(wrapped_data))
 
     while True:
