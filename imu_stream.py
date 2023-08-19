@@ -67,7 +67,7 @@ def get_x_rotation(x, y, z):
 
 
 def data_wrapper(name, value):
-    prepared_string = {"[", name, ":",  value, "]"}
+    prepared_string = str({"[", name, ":",  value, "]"})
     return prepared_string
 
 
