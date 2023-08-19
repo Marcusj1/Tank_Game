@@ -7,3 +7,4 @@ sudo git reset --hard
 sudo git pull
 sudo python3 imu_stream.py
 cd /
+
