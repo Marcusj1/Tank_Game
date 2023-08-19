@@ -91,6 +91,10 @@ def client(conn, connection_number):
     i = 0
 
     def send(data_name, data_value):
+        if data_name.find(":") == -1:
+            raise Exception
+        if not type(data_name) == str:
+            raise Exception
         wrapped_data = data_wrapper(data_name, data_value)
         conn.send(str.encode(wrapped_data))
 
@@ -129,7 +133,7 @@ def client(conn, connection_number):
         avg_accel = sum(y) / len(y)
         std_dev = statistics.pstdev(y)
 
-        send("avg accel:", avg_accel)
+        send("avg accel", avg_accel)
 
 sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 port = 5555
