@@ -91,7 +91,7 @@ def client(conn, connection_number):
     i = 0
 
     def send(data_name, data_value):
-        if data_name.find(":") == -1:
+        if not data_name.find(":") == -1:
             print("data name can't have a colin in it")
             raise Exception
         if not type(data_name) == str:
